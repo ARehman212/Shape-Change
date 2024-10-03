@@ -4,23 +4,19 @@ using UnityEngine;
 
 public class MoveForward : MonoBehaviour
 {
-    public float speed;
+    public float speed = 5f;   // Set a default speed
+    private float boundary = -170f;   // Adjust boundary to match the leftward movement
 
-    private float boundry = 170;
-    // Start is called before the first frame update
-    void Start()
+    // Update is called once per frame (use FixedUpdate for smoother movement)
+    void FixedUpdate()
     {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
+        // Move the object left over time
         transform.Translate(Vector3.left * speed * Time.deltaTime);
-        if (transform.position.x > boundry)
+
+        // Check if the object has crossed the left boundary, then destroy it
+        if (transform.position.x < boundary)
         {
             Destroy(gameObject);
         }
     }
 }
-

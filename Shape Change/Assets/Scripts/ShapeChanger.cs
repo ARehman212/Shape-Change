@@ -8,15 +8,17 @@ public class ShapeChanger : MonoBehaviour
     public GameObject spherePrefab;    // Prefab for sphere
     public GameObject cylinderPrefab;  // Prefab for cylinder
     private GameObject currentShape;   // The current player shape
-    private Vector3 originalScale;     // Original scale of the player
+    private Vector3 targetScale;       // Target scale for smoother scaling
     public float sizeChangeSpeed = 0.1f; // Speed of size change
+    public float scaleSmoothSpeed = 5f; // Speed of scale smoothing
+    public float cameraTransitionSpeed = 5f; // Speed for camera smoothing
 
     private Camera mainCamera;
 
     private void Start()
     {
         // Store the original scale of the player and keep the current shape as the original
-        originalScale = transform.localScale;
+        targetScale = transform.localScale;
         currentShape = gameObject; // Start with the original player shape
 
         // Reference the main camera
@@ -27,6 +29,9 @@ public class ShapeChanger : MonoBehaviour
     {
         // Continue resizing the shape when dragging the mouse
         HandleResizing();
+
+        // Smoothly update the shape's scale
+        SmoothScale();
 
         // Change the player's appearance based on key presses
         HandleShapeChange();
@@ -41,16 +46,26 @@ public class ShapeChanger : MonoBehaviour
             float mouseY = Input.GetAxis("Mouse Y") * sizeChangeSpeed;
             float mouseX = Input.GetAxis("Mouse X") * sizeChangeSpeed;
 
-            // Apply Y-axis movement to the Y scale and X-axis movement to the Z scale
-            currentShape.transform.localScale += new Vector3(0, mouseY, mouseX); // Change Y and Z scales
+            // Update the target scale based on mouse input
+            targetScale += new Vector3(0, mouseY, mouseX); // Change Y and Z scales
 
-            // Clamp the Y scale to prevent it from going negative or too small
-            currentShape.transform.localScale = new Vector3(
-                currentShape.transform.localScale.x, // Keep X scale unchanged
-                Mathf.Max(currentShape.transform.localScale.y, 0.1f), // Prevent Y scale from going below 0.1
-                Mathf.Max(currentShape.transform.localScale.z, 0.1f) // Prevent Z scale from going below 0.1
+            // Clamp the target Y and Z scale to prevent them from going negative or too small
+            targetScale = new Vector3(
+                targetScale.x, // Keep X scale unchanged
+                Mathf.Max(targetScale.y, 0.1f), // Prevent Y scale from going below 0.1
+                Mathf.Max(targetScale.z, 0.1f)  // Prevent Z scale from going below 0.1
             );
         }
+    }
+
+    private void SmoothScale()
+    {
+        // Smoothly interpolate the current scale towards the target scale
+        currentShape.transform.localScale = Vector3.Lerp(
+            currentShape.transform.localScale,
+            targetScale,
+            Time.deltaTime * scaleSmoothSpeed
+        );
     }
 
     private void HandleShapeChange()
@@ -83,14 +98,28 @@ public class ShapeChanger : MonoBehaviour
 
         // Instantiate the new shape at the saved position and rotation
         currentShape = Instantiate(newShapePrefab, currentPosition, currentRotation);
-        currentShape.transform.localScale = originalScale; // Keep the original scale
+        currentShape.transform.localScale = targetScale; // Keep the target scale
 
-        // Transfer the camera to the new shape
-        mainCamera.transform.SetParent(currentShape.transform); // Attach the camera to the new shape
-        mainCamera.transform.localPosition = new Vector3(0, 2, -5); // Adjust camera position relative to the new shape
-        mainCamera.transform.localRotation = Quaternion.identity; // Reset the camera rotation to default
+        // Smoothly transition the camera to the new shape
+        StartCoroutine(SmoothCameraTransition());
+    }
 
-        // Transfer player movement/controls to the new shape if applicable
-        currentShape.AddComponent<MoveForward>(); // Add your movement script to the new shape
+    private IEnumerator SmoothCameraTransition()
+    {
+        Vector3 targetCameraPosition = currentShape.transform.position + new Vector3(0, 2, -5); // Adjust camera position relative to the new shape
+        Quaternion targetCameraRotation = Quaternion.identity; // Reset the camera rotation to default
+
+        while (Vector3.Distance(mainCamera.transform.position, targetCameraPosition) > 0.1f)
+        {
+            // Smoothly move the camera towards the target position and rotation
+            mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, targetCameraPosition, Time.deltaTime * cameraTransitionSpeed);
+            mainCamera.transform.rotation = Quaternion.Lerp(mainCamera.transform.rotation, targetCameraRotation, Time.deltaTime * cameraTransitionSpeed);
+
+            yield return null;
+        }
+
+        // Ensure the camera is perfectly aligned after the transition
+        mainCamera.transform.position = targetCameraPosition;
+        mainCamera.transform.rotation = targetCameraRotation;
     }
 }
