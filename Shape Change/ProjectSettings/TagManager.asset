@@ -8,6 +8,13 @@ TagManager:
   - Sphere
   - Cylinder
   - PlayerLight
+  - ShapeMover
+  - Trigger
+  - Path
+  - Undefined
+  - Herdle1
+  - Herdle2
+  - Herdle3
   layers:
   - Default
   - TransparentFX

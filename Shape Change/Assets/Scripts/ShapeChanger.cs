@@ -4,22 +4,18 @@ using UnityEngine;
 
 public class ShapeChanger : MonoBehaviour
 {
-    public GameObject trianglePrefab;  // Prefab for triangle
-    public GameObject spherePrefab;    // Prefab for sphere
-    public GameObject cylinderPrefab;  // Prefab for cylinder
-    private GameObject currentShape;   // The current player shape
-    private Vector3 targetScale;       // Target scale for smoother scaling
+    private Vector3 targetScale;        // Target scale for smoother scaling
     public float sizeChangeSpeed = 0.1f; // Speed of size change
-    public float scaleSmoothSpeed = 5f; // Speed of scale smoothing
-    public float cameraTransitionSpeed = 5f; // Speed for camera smoothing
-
+    public float scaleSmoothSpeed = 5f;  // Speed of scale smoothing
+    public float moveSpeed = 5f;         // Speed for movement along the Z-axis
     private Camera mainCamera;
+    private float zMinLimit = -2.4f;     // Minimum Z-axis position
+    private float zMaxLimit = 2.4f;      // Maximum Z-axis position
 
     private void Start()
     {
-        // Store the original scale of the player and keep the current shape as the original
+        // Store the original scale of the object
         targetScale = transform.localScale;
-        currentShape = gameObject; // Start with the original player shape
 
         // Reference the main camera
         mainCamera = Camera.main;
@@ -33,13 +29,13 @@ public class ShapeChanger : MonoBehaviour
         // Smoothly update the shape's scale
         SmoothScale();
 
-        // Change the player's appearance based on key presses
-        HandleShapeChange();
+        // Handle movement along the Z-axis with boundaries
+        HandleMovement();
     }
 
     private void HandleResizing()
     {
-        // Change the player's size when dragging the mouse
+        // Change the object's size when dragging the mouse
         if (Input.GetMouseButton(0)) // Left mouse button held down
         {
             // Get the mouse movement in both the Y and X axes
@@ -49,11 +45,11 @@ public class ShapeChanger : MonoBehaviour
             // Update the target scale based on mouse input
             targetScale += new Vector3(0, mouseY, mouseX); // Change Y and Z scales
 
-            // Clamp the target Y and Z scale to prevent them from going negative or too small
+            // Clamp the target Y and Z scale to a minimum of 1
             targetScale = new Vector3(
-                targetScale.x, // Keep X scale unchanged
-                Mathf.Max(targetScale.y, 0.1f), // Prevent Y scale from going below 0.1
-                Mathf.Max(targetScale.z, 0.1f)  // Prevent Z scale from going below 0.1
+                targetScale.x,                    // Keep X scale unchanged
+                Mathf.Max(targetScale.y, 1f),     // Y scale minimum of 1
+                Mathf.Max(targetScale.z, 1f)      // Z scale minimum of 1
             );
         }
     }
@@ -61,65 +57,22 @@ public class ShapeChanger : MonoBehaviour
     private void SmoothScale()
     {
         // Smoothly interpolate the current scale towards the target scale
-        currentShape.transform.localScale = Vector3.Lerp(
-            currentShape.transform.localScale,
+        transform.localScale = Vector3.Lerp(
+            transform.localScale,
             targetScale,
             Time.deltaTime * scaleSmoothSpeed
         );
     }
 
-    private void HandleShapeChange()
+    private void HandleMovement()
     {
-        // Change the player's appearance based on key presses
-        if (Input.GetKeyDown(KeyCode.A)) // Press A for triangle
-        {
-            ChangeShape(trianglePrefab);
-        }
-        else if (Input.GetKeyDown(KeyCode.S)) // Press S for sphere
-        {
-            ChangeShape(spherePrefab);
-        }
-        else if (Input.GetKeyDown(KeyCode.D)) // Press D for cylinder
-        {
-            ChangeShape(cylinderPrefab);
-        }
-    }
+        // Move the object along the Z-axis using the right and left arrow keys
+        float moveZ = Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
 
-    private void ChangeShape(GameObject newShapePrefab)
-    {
-        Vector3 currentPosition = currentShape.transform.position; // Save the current position
-        Quaternion currentRotation = currentShape.transform.rotation; // Save the current rotation
+        // Calculate new Z position with boundary checks
+        float newZPosition = Mathf.Clamp(transform.position.z + moveZ, zMinLimit, zMaxLimit);
 
-        // Destroy the current shape only if it's not the original player object
-        if (currentShape != null && currentShape != gameObject)
-        {
-            Destroy(currentShape);
-        }
-
-        // Instantiate the new shape at the saved position and rotation
-        currentShape = Instantiate(newShapePrefab, currentPosition, currentRotation);
-        currentShape.transform.localScale = targetScale; // Keep the target scale
-
-        // Smoothly transition the camera to the new shape
-        StartCoroutine(SmoothCameraTransition());
-    }
-
-    private IEnumerator SmoothCameraTransition()
-    {
-        Vector3 targetCameraPosition = currentShape.transform.position + new Vector3(0, 2, -5); // Adjust camera position relative to the new shape
-        Quaternion targetCameraRotation = Quaternion.identity; // Reset the camera rotation to default
-
-        while (Vector3.Distance(mainCamera.transform.position, targetCameraPosition) > 0.1f)
-        {
-            // Smoothly move the camera towards the target position and rotation
-            mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, targetCameraPosition, Time.deltaTime * cameraTransitionSpeed);
-            mainCamera.transform.rotation = Quaternion.Lerp(mainCamera.transform.rotation, targetCameraRotation, Time.deltaTime * cameraTransitionSpeed);
-
-            yield return null;
-        }
-
-        // Ensure the camera is perfectly aligned after the transition
-        mainCamera.transform.position = targetCameraPosition;
-        mainCamera.transform.rotation = targetCameraRotation;
+        // Update the object's position within the allowed range
+        transform.position = new Vector3(transform.position.x, transform.position.y, newZPosition);
     }
 }
