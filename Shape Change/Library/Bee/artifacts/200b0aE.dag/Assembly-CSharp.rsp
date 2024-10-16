@@ -369,6 +369,7 @@
 "Assets/Scripts/Herdle.cs"
 "Assets/Scripts/HerdleSpawner.cs"
 "Assets/Scripts/MoveForward.cs"
+"Assets/Scripts/PrefabSpawnerOnPath2.cs"
 "Assets/Scripts/SectionTrigger.cs"
 "Assets/Scripts/ShapeChanger.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01.cs"
