@@ -1,0 +1,19 @@
+<libraries>
+  <library
+      name="/Users/muhammadshahrukh/Github/Shape-Change/Shape Change/Library/Bee/Android/Prj/Mono2x/Gradle@@:unityLibrary::release"
+      jars="/Users/muhammadshahrukh/Github/Shape-Change/Shape Change/Library/Bee/Android/Prj/Mono2x/Gradle/unityLibrary/build/.transforms/02ac1a38cc257c3cbf30006aa4777e21/transformed/out/jars/classes.jar:/Users/muhammadshahrukh/Github/Shape-Change/Shape Change/Library/Bee/Android/Prj/Mono2x/Gradle/unityLibrary/build/.transforms/02ac1a38cc257c3cbf30006aa4777e21/transformed/out/jars/libs/unity-classes.jar"
+      resolved="Gradle:unityLibrary:unspecified"
+      folder="/Users/muhammadshahrukh/Github/Shape-Change/Shape Change/Library/Bee/Android/Prj/Mono2x/Gradle/unityLibrary/build/.transforms/02ac1a38cc257c3cbf30006aa4777e21/transformed/out"
+      manifest="AndroidManifest.xml"
+      resFolder="res"
+      assetsFolder="assets"
+      lintJar="lint.jar"
+      publicResources="public.txt"
+      symbolFile="R.txt"
+      externalAnnotations="annotations.zip"
+      proguardRules="proguard.txt"/>
+  <library
+      name="__local_aars__:/Users/muhammadshahrukh/Github/Shape-Change/Shape Change/Library/Bee/Android/Prj/Mono2x/Gradle/unityLibrary/libs/unity-classes.jar:unspecified@jar"
+      jars="/Users/muhammadshahrukh/Github/Shape-Change/Shape Change/Library/Bee/Android/Prj/Mono2x/Gradle/unityLibrary/libs/unity-classes.jar"
+      resolved="__local_aars__:/Users/muhammadshahrukh/Github/Shape-Change/Shape Change/Library/Bee/Android/Prj/Mono2x/Gradle/unityLibrary/libs/unity-classes.jar:unspecified"/>
+</libraries>

@@ -4,18 +4,13 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Traingle
   - Sphere
-  - Cylinder
-  - PlayerLight
   - ShapeMover
   - Trigger
   - Path
-  - Undefined
-  - Herdle1
-  - Herdle2
-  - Herdle3
-  - Herdle4
+  - obstacle
+  - Point
+  - FinishLine
   layers:
   - Default
   - TransparentFX
